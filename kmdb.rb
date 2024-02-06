@@ -1,4 +1,4 @@
-# In this assignment, you'll be using the domain model from hw1 (found in the hw1-solution.sql file)
+# In this assignment, you'll be using the domain model from hw1 (found in the hw1-solution.sql file)rails db:migrate:status
 # to create the database structure for "KMDB" (the Kellogg Movie Database).
 # The end product will be a report that prints the movies and the top-billed
 # cast for each movie in the database.
@@ -71,12 +71,94 @@
 # Use `Model.destroy_all` code.
 # TODO!
 
+Studio.destroy_all
+Movie.destroy_all
+Actor.destroy_all
+Cast.destroy_all
+
 # Generate models and tables, according to the domain model.
 # TODO!
 
 # Insert data into the database that reflects the sample data shown above.
 # Do not use hard-coded foreign key IDs.
 # TODO!
+
+# Insert data in to studio
+
+studio_1 = Studio.new
+studio_1 ["name"] = "Warner Bros"
+studio_1 ["location"] = "Burbank, California"
+
+studio_1.save
+
+# Insert data into Movies
+
+movie_1 = Movie.new
+movie_1 ["title"]         = "Batman Begins"
+movie_1 ["year_released"] = 2005
+movie_1 ["mpaa_rating"]   = "PG-13"
+movie_1 ["studio_id"]     = 1
+
+movie_1.save
+
+movie_2 = Movie.new
+movie_2 ["title"]         = "The Dark Knight"
+movie_2 ["year_released"] = 2008 
+movie_2 ["mpaa_rating"]   = "PG-13"
+movie_2 ["studio_id"]     = 1
+
+movie_2.save
+
+movie_3 = Movie.new
+movie_3 ["title"]         = "The Dark Knight Rises"
+movie_3 ["year_released"] = 2012
+movie_3 ["mpaa_rating"]   = "PG-13"
+movie_3 ["studio_id"]     = 1
+
+movie_3.save
+
+# Insert data into Actors                  ###### Using different insert syntax to ease up the data insertion process#######
+
+actors_data = [
+  ['Christian Bale', 'British'],
+  ['Michael Caine', 'British'],
+  ['Liam Neeson', 'Irish'],
+  ['Katie Holmes', 'American'],
+  ['Gary Oldman', 'British'],
+  ['Heath Ledger', 'Australian'],
+  ['Aaron Eckhart', 'American'],
+  ['Maggie Gyllenhaal' ,'American'],
+  ['Tom Hardy', 'British'],
+  ['Joseph Gordon-Levitt',  'American'],
+  ['Anne Hathaway',  'American']
+]
+
+actors_data.each do |name, nationality|
+  Actor.create(name: name, nationality: nationality)
+end
+
+# Insert data into Cast
+casts_data = [
+  [1, 1, 'Bruce Wayne'],
+  [1, 2, 'Alfred'],
+  [1, 3, 'Ra\'s Al Ghul'],
+  [1, 4, 'Rachel Dawes'],
+  [1, 5, 'Commissioner Gordon'],
+  [2, 1, 'Bruce Wayne'],
+  [2, 6, 'Joker'],
+  [2, 7, 'Harvey Dent'],
+  [2, 2, 'Alfred'],
+  [2, 8, 'Rachel Dawes'],
+  [3, 1, 'Bruce Wayne'],
+  [3, 5, 'Commissioner Gordon'],
+  [3, 9, 'Bane'],
+  [3, 10, 'John Blake'],
+  [3, 11, 'Selina Kyle']
+]
+
+casts_data.each do |movie_id, actor_id, character_name|
+  Cast.create(movie_id: movie_id, actor_id: actor_id, character_name: character_name)
+end
 
 # Prints a header for the movies output
 puts "Movies"
@@ -86,6 +168,20 @@ puts ""
 # Query the movies data and loop through the results to display the movies output.
 # TODO!
 
+movies = Movie.all
+
+for movie in movies
+
+    # read the relevant columns from the movie row
+    movie_title = movie["title"]
+    movie_released = movie["year_released"]
+    movie_rating = movie["mpaa_rating"]
+    movie_studio = movie["studio_id"]
+  
+    # display a string with the relevant columns
+    puts "#{movie_title} #{movie_released} #{movie_rating} #{movie_studio}"
+  end
+
 # Prints a header for the cast output
 puts ""
 puts "Top Cast"
@@ -94,3 +190,19 @@ puts ""
 
 # Query the cast data and loop through the results to display the cast output for each movie.
 # TODO!
+
+movies = Movie.includes(casts: :actor).all
+
+for movie in movies
+  puts "Movie: #{movie.title}"
+
+  for cast in movie.casts
+    actor_name = cast.actor.name 
+    character_name = cast.character_name 
+    puts "  - #{actor_name} as #{character_name}"
+  end
+end
+
+  
+  ######## I think my query is right but having an issue in association and that not giving me expected output. I doubled check my db migration and its
+  ########  looks fine.
